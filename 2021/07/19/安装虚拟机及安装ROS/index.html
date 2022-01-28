@@ -1,384 +1,85 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  
-  
-  <title>安装虚拟机及安装ROS | Riceater</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="2021&#x2F;7&#x2F;19 Blackfankt 一、安装VMware Workstation Player直接去 https:&#x2F;&#x2F;www.vmware.com&#x2F;cn&#x2F;products&#x2F;workstation-player&#x2F;workstation-player-evaluation.html 根据电脑的操作系统下载最新版本的VMware Workstation Player即可 然后直接运行exe文件安装">
-<meta property="og:type" content="article">
-<meta property="og:title" content="安装虚拟机及安装ROS">
-<meta property="og:url" content="https://blackfankt.github.io/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/index.html">
-<meta property="og:site_name" content="Riceater">
-<meta property="og:description" content="2021&#x2F;7&#x2F;19 Blackfankt 一、安装VMware Workstation Player直接去 https:&#x2F;&#x2F;www.vmware.com&#x2F;cn&#x2F;products&#x2F;workstation-player&#x2F;workstation-player-evaluation.html 根据电脑的操作系统下载最新版本的VMware Workstation Player即可 然后直接运行exe文件安装">
-<meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://blackfankt.github.io/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/01.png">
-<meta property="og:image" content="https://blackfankt.github.io/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/02.png">
-<meta property="og:image" content="https://blackfankt.github.io/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/03.png">
-<meta property="og:image" content="https://blackfankt.github.io/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/04.png">
-<meta property="og:image" content="https://blackfankt.github.io/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/05.png">
-<meta property="og:image" content="https://blackfankt.github.io/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/06.png">
-<meta property="og:image" content="https://blackfankt.github.io/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/07.png">
-<meta property="og:image" content="https://blackfankt.github.io/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/08.png">
-<meta property="og:image" content="https://blackfankt.github.io/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/09.png">
-<meta property="article:published_time" content="2021-07-19T09:37:49.000Z">
-<meta property="article:modified_time" content="2022-01-28T07:30:18.716Z">
-<meta property="article:author" content="Blackfankt">
-<meta property="article:tag" content="教程">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://blackfankt.github.io/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/01.png">
-  
-    <link rel="alternate" href="/atom.xml" title="Riceater" type="application/atom+xml">
-  
-  
-    <link rel="shortcut icon" href="/favicon.png">
-  
-  
-    
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+extends includes/layout.pug
 
-  
-  
-<link rel="stylesheet" href="/css/style.css">
+block content
+  -
+    const prev = page.prev
+    const next = page.next
+    const dateConf = theme.post.date
+    const updatedConf = theme.post.updated
+    const sourceConf = theme.post.source
+    const excerptConf = theme.post.excerpt
+    const reward = theme.post.reward
+    const appID = theme.valine.app_id
+    const appKey = theme.valine.app_key
+    const tocContent = toc(page.content, theme.toc)
+  #post-bg
+    #post-title
+      if dateConf || updatedConf
+        #post-info
+          if dateConf
+            span date:
+              time(datetime=page.date.toJSON())#date
+                = ' ' + date(page.date, date_format)
+          if dateConf && updatedConf
+            br
+          if updatedConf
+            span updated:
+              time(datetime=page.updated.toJSON())#updated
+                = ' ' + date(page.updated, date_format)
+          if sourceConf
+            br
+            span#post-source Source File:
+              br
+              span= page.source
+      h1= page.title
+      hr
+    #post-content
+      if excerptConf
+        != page.content
+      else
+        != page.more
+      #paginator!= paginator()
+    #post-footer
+      if prev || next
+        hr
+      if prev !== undefined
+        a(href=url_for(prev.path))
+          |← Prev
+          =' ' + prev.title
+      if prev && next
+        <span style="color: #fe2"> | </span>
+      if next !== undefined
+        a(href=url_for(next.path))
+          =next.title + ' '
+          |Next →
+      if prev || next
+        hr
+    #bottom-btn
+      if tocContent.length > 0
+        a#to-index(href="#post-index" title="index") ≡
+      a#to-top(href="#post-title" title="to top") ∧
+    if reward === true
+      details#reward
+        summary 打赏
+        #alipay
+          span 支付宝 | Alipay
+          br
+          img(src= config.root + 'img/Alipay.png')
+        #wechat
+          span 微信 | WeChat
+          br
+          img(src= config.root + 'img/WeChat.png')
+    #Valine
+    script
+      |new Valine({
+      |  el: '#Valine'
+      |  , appId: '#{appID}'
+      |  , appKey: '#{appKey}'
+      |  , placeholder: '此条评论委托企鹅物流发送'
+      |})
 
-  
-    
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
-
-  
-<meta name="generator" content="Hexo 5.4.1"></head>
-
-<body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">Riceater</a>
-      </h1>
-      
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://Blackfankt.github.io"></form>
-      </div>
-    </div>
-  </div>
-</header>
-
-      <div class="outer">
-        <section id="main"><article id="post-安装虚拟机及安装ROS" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/" class="article-date">
-  <time class="dt-published" datetime="2021-07-19T09:37:49.000Z" itemprop="datePublished">2021-07-19</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="p-name article-title" itemprop="headline name">
-      安装虚拟机及安装ROS
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <p>2021/7/19 Blackfankt</p>
-<h3 id="一、安装VMware-Workstation-Player"><a href="#一、安装VMware-Workstation-Player" class="headerlink" title="一、安装VMware Workstation Player"></a>一、安装VMware Workstation Player</h3><p>直接去</p>
-<p><a target="_blank" rel="noopener" href="https://www.vmware.com/cn/products/workstation-player/workstation-player-evaluation.html">https://www.vmware.com/cn/products/workstation-player/workstation-player-evaluation.html</a></p>
-<p>根据电脑的操作系统下载最新版本的VMware Workstation Player即可</p>
-<p>然后直接运行exe文件安装。</p>
-<h3 id="二、新建一个虚拟机（以安装Ubuntu18-04为例）"><a href="#二、新建一个虚拟机（以安装Ubuntu18-04为例）" class="headerlink" title="二、新建一个虚拟机（以安装Ubuntu18.04为例）"></a>二、新建一个虚拟机（以安装Ubuntu18.04为例）</h3><p>首先我们需要一个Ubuntu18.04镜像文件</p>
-<p>由于官网下载实在太慢</p>
-<p>所以选择从阿里云下载</p>
-<p><a target="_blank" rel="noopener" href="http://mirrors.aliyun.com/ubuntu-releases/18.04/">http://mirrors.aliyun.com/ubuntu-releases/18.04/</a></p>
-<p><img src="/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/01.png"></p>
-<p>下载上图箭头所指的iso文件</p>
-<p>下载完成后打开VMware Workstation Player</p>
-<p>点击创建新虚拟机</p>
-<p><img src="/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/02.png"></p>
-<p>选择刚刚下载的Ubuntu镜像</p>
-<p><img src="/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/03.png"></p>
-<p>点击下一步</p>
-<p><img src="/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/04.png"></p>
-<p><img src="/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/05.png"></p>
-<p>进行一些个性化设置之后点击下一步</p>
-<p><img src="/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/06.png"></p>
-<p><strong>虚拟机的位置选择建议放在一个剩余储存空间充足的地方，因为对于创建好的虚拟机来说更改内存和储存比较麻烦，所以建议创建时预留足够的空间</strong></p>
-<p><img src="/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/07.png"></p>
-<p>一般来说移动虚拟机的操作很少（至少我没用到）所以可不必拆分磁盘。</p>
-<p><img src="/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/08.png"></p>
-<p>这里点击自定义硬件可以进一步修改虚拟机的配置，比如修改虚拟机的内存、将网络适配器调成桥接模式等，这一步比较简单。</p>
-<p>但注意虚拟机一旦创建好之后修改内存比较麻烦，所以可以适当调大一点。</p>
-<p>然后点击下一步一直到完成就可以啦。</p>
-<p>完成后自动打开虚拟机，然后进行系统初始化操作。</p>
-<p><em>P.S.</em> 如果进入虚拟机之后发现没网，可将网络适配器调整为桥接模式。</p>
-<p><em>P.P.S</em> 如果发现最大化VMware之后虚拟机窗口很小，说明vm-tools没有安装成功，原因大多数是初始化Ubuntu的时候没有连接网络，这个情况的解决方案是：删除现在的虚拟机（从硬盘里删除，防止原来不用的虚拟机占去空间），然后重新创建一个虚拟机，在最后的时候点击<strong>自定义硬件</strong>修改网络适配器为桥接模式。</p>
-<h3 id="三、安装ROS"><a href="#三、安装ROS" class="headerlink" title="三、安装ROS"></a>三、安装ROS</h3><p>（此教程跟随<a target="_blank" rel="noopener" href="http://wiki.ros.org/">http://wiki.ros.org/</a>)</p>
-<p>由于是以Ubuntu18.04为例，所以本教程安装的ROS版本是Melodic版。</p>
-<p>需要安装其他版本的话也是差不多的。</p>
-<p>在此之前，如果没有科学上网工具的话，是需要为我们的Ubuntu换源。</p>
-<p>以清华源为例：</p>
-<hr>
-<h5 id="换源"><a href="#换源" class="headerlink" title="换源"></a>换源</h5><p>1.备份原来的源</p>
-<p>打开terminal，输入下列命令</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo cp /etc/apt/sources.list /etc/apt/sources_init.list</span><br></pre></td></tr></table></figure>
-
-<p>2.换源</p>
-<p>打开terminal，输入下列命令</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo gedit /etc/apt/sources.list</span><br></pre></td></tr></table></figure>
-
-<p>使用gedit打开文档之后，删除原来文档的所有内容，将下边的清华源复制进去</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic main restricted universe multiverse</span><br><span class="line">deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic main restricted universe multiverse</span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse</span><br><span class="line">deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse</span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse</span><br><span class="line">deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse</span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse</span><br><span class="line">deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse</span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse</span><br><span class="line">deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse</span><br></pre></td></tr></table></figure>
-
-<p>（该换源操作是在pc上操作，是x86的源，如果要在开发板上操作，是需要换arm架构的源，以清华源为例，gedit打开文档之后，单纯的将所有的ports.ubuntu.com换成mirrors.tuna.tsinghua.edu.cn/ubuntu-ports即可）</p>
-<p>右上角保存之后关闭即可。</p>
-<p>3.更新源</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br></pre></td></tr></table></figure>
-
-<p>4.更新软件</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get upgrade</span><br></pre></td></tr></table></figure>
-
-<p>根据提示输入Y。</p>
-<p>更新有可能不成功，重复执行3，4即可</p>
-<p>最后terminal上出现这样的界面说明换源成功：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">Calculating upgrade... Done</span><br><span class="line">The following packages have been kept back:</span><br><span class="line">  linux-generic-hwe-18.04 linux-headers-generic-hwe-18.04</span><br><span class="line">  linux-image-generic-hwe-18.04 ubuntu-advantage-tools ubuntu-drivers-common</span><br><span class="line">0 upgraded, 0 newly installed, 0 to remove and 5 not upgraded.</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p>换好源之后，就可以进行ros的安装了。</p>
-<p>以下操作均在terminal上完成，按照代码块上的命令输入回车就好。</p>
-<hr>
-<p>1.（默认已经换好源，不需要科学上网工具）</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo sh -c &#x27;. /etc/lsb-release &amp;&amp; echo &quot;deb http://mirrors.tuna.tsinghua.edu.cn/ros/ubuntu/ `lsb_release -cs` main&quot; &gt; /etc/apt/sources.list.d/ros-latest.list&#x27;</span><br></pre></td></tr></table></figure>
-
-<p>2.如果虚拟机上没有安装curl（一般没有安装，如果不确定执行一下命令也没什么坏处）</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install curl</span><br></pre></td></tr></table></figure>
-
-<p>3.更新密钥</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -sSL &#x27;http://keyserver.ubuntu.com/pks/lookup?op=get&amp;search=0xC1CF6E31E6BADE8868B172B4F42ED6FBAB17C654&#x27; | sudo apt-key add -</span><br></pre></td></tr></table></figure>
-
-<p>4.确保debian索引包是最新的</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br></pre></td></tr></table></figure>
-
-<p>5.安装ROS-Melodic</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install ros-melodic-desktop-full</span><br></pre></td></tr></table></figure>
-
-<p>6.更新环境</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;source /opt/ros/melodic/setup.bash&quot; &gt;&gt; ~/.bashrc</span><br><span class="line">source ~/.bashrc</span><br></pre></td></tr></table></figure>
-
-<p>7.安装一些常用工具</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential</span><br></pre></td></tr></table></figure>
-
-<p>8.初始化rosdep</p>
-<pre><code> 如果还没有安装rosdep的话(第7步有安装)
-</code></pre>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install python-rosdep</span><br></pre></td></tr></table></figure>
-
-<p>初始化</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo rosdep init</span><br></pre></td></tr></table></figure>
-
-<hr>
-<hr>
-<hr>
-<p>P.S. 如果出现Website may be down的报错，则依照下面的方法可以解决：</p>
-<p><em>方法一：</em></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo gedit /etc/hosts</span><br></pre></td></tr></table></figure>
-
-<p>在文档的最后加上</p>
-<p>185.199.108.133   raw.githubusercontent.com</p>
-<p>（第一行的ip地址和网上教程的可能不一样，是因为ip地址可能会有改变，所以建议使用这种方法之前去查一查raw.githubusercontent.com这个网站的ip</p>
-<p><em>方法二：</em></p>
-<p>使用科学上网工具</p>
-<p><em>方法三：</em>（需确保<strong>虚拟机内</strong>能用浏览器打开<a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/sources.list.d/20-default.list%EF%BC%89">https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/sources.list.d/20-default.list）</a></p>
-<p>首先我们人工打开<a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/sources.list.d/20-default.list%EF%BC%8C%E5%8F%91%E7%8E%B0%E9%87%8C%E9%9D%A2%E6%98%AF%E4%B8%80%E4%BA%9B%E7%BD%91%E5%9D%80%EF%BC%8C%E5%85%B6%E5%AE%9Erosdep">https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/sources.list.d/20-default.list，发现里面是一些网址，其实rosdep</a> init这一操作就是链接这些网址，只不过由于网络原因没有成功拉下来。所以我们可以直接手动拉到本地。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo mkdir -p /etc/ros/rosdep/sources.list.d</span><br><span class="line">cd /etc/ros/rosdep/sources.list.d</span><br><span class="line">sudo gedit 20-default.list </span><br></pre></td></tr></table></figure>
-
-<p>以上操作分别对应创建文件夹、切到文件夹里面去、创建并编辑20-default.list这个文件</p>
-<p>然后将下列内容添加至20-default.list这个文件中去</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># os-specific listings first</span><br><span class="line">yaml https://raw.github.com/ros/rosdistro/master/rosdep/osx-homebrew.yaml osx</span><br><span class="line"></span><br><span class="line"># generic</span><br><span class="line">yaml https://raw.github.com/ros/rosdistro/master/rosdep/base.yaml</span><br><span class="line">yaml https://raw.github.com/ros/rosdistro/master/rosdep/python.yaml</span><br><span class="line">yaml https://raw.github.com/ros/rosdistro/master/rosdep/ruby.yaml</span><br><span class="line">gbpdistro https://raw.github.com/ros/rosdistro/master/releases/fuerte.yaml fuerte</span><br><span class="line"></span><br><span class="line"># newer distributions (Groovy, Hydro, ...) must not be listed anymore, they are being fetched from the rosdistro index.yaml instead</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>其实就是把<a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/sources.list.d/20-default.list%E5%86%85%E5%AE%B9%E9%87%8C%E7%9A%84githubusercontent%E6%8D%A2%E6%88%90github">https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/sources.list.d/20-default.list内容里的githubusercontent换成github</a> 。</p>
-<p>这一方法是手动初始化，所以文件建好之后直接rosdep update即可。</p>
-<p><strong>P.P.S</strong></p>
-<p>出现website may be down这个错误时，一般来说是网络问题，网站被墙掉了，所以rosdep init是个很需要运气的操作，如果没有初始化成功，可以尝试各种方法，换网，使用热点等等，总之方法是很多的，我也没有全部写进教程，选择了一些比较好操作的或者说我用能成功的方法，如果上述方法都不行的话也可自己网上找一找，或者，换个时间再来。</p>
-<hr>
-<hr>
-<hr>
-<p>当sudo rosdep init 成功后就执行下列命令。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rosdep update</span><br></pre></td></tr></table></figure>
-
-<h5 id="检查ROS是否安装成功："><a href="#检查ROS是否安装成功：" class="headerlink" title="检查ROS是否安装成功："></a>检查ROS是否安装成功：</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">roscore</span><br></pre></td></tr></table></figure>
-
-<p>当出现这个界面时</p>
-<p><img src="/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/09.png"></p>
-<p>新开一个terminal</p>
-<p>输入</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rosrun turtlesim turtlesim_node</span><br></pre></td></tr></table></figure>
-
-<p>当你见到你的屏幕中出现一只小海龟时，就说明ros安装成功啦~~~</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://blackfankt.github.io/2021/07/19/%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8F%8A%E5%AE%89%E8%A3%85ROS/" data-id="ckyy31kgm0001www5edyxejwq" data-title="安装虚拟机及安装ROS" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%99%E7%A8%8B/" rel="tag">教程</a></li></ul>
-
-    </footer>
-  </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2021/10/22/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">前一篇</strong>
-      <div class="article-nav-title">
-        
-          实验2 目录树的遍历
-        
-      </div>
-    </a>
-  
-  
-</nav>
-
-  
-</article>
-
-
-</section>
-        
-          <aside id="sidebar">
-  
-    
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签</h3>
-    <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unix%E5%AE%9E%E9%AA%8C/" rel="tag">Unix实验</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E5%AE%9E%E9%AA%8C/" rel="tag">《计算机网络与通信》实验</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%99%E7%A8%8B/" rel="tag">教程</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签云</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/Unix%E5%AE%9E%E9%AA%8C/" style="font-size: 20px;">Unix实验</a> <a href="/tags/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E5%AE%9E%E9%AA%8C/" style="font-size: 20px;">《计算机网络与通信》实验</a> <a href="/tags/%E6%95%99%E7%A8%8B/" style="font-size: 10px;">教程</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">归档</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">十二月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/11/">十一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">七月 2021</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">最新文章</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2021/12/28/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%94%EF%BC%9A%E8%BF%90%E8%BE%93%E5%B1%82%E5%92%8C%E5%BA%94%E7%94%A8%E5%B1%82%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90/">《计算机网络与通信》课程实验五：运输层和应用层协议分析</a>
-          </li>
-        
-          <li>
-            <a href="/2021/12/19/%E5%AE%9E%E9%AA%8C5%20%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86/">实验5 信号处理</a>
-          </li>
-        
-          <li>
-            <a href="/2021/12/14/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E5%9B%9B%20%E8%BF%90%E7%94%A8ns-3%E5%88%86%E6%9E%90%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/">《计算机网络与通信》课程实验四 运用ns-3分析路由协议</a>
-          </li>
-        
-          <li>
-            <a href="/2021/12/01/%E5%AE%9E%E9%AA%8C4%20%E7%BC%96%E5%88%B6%E6%A8%A1%E6%8B%9F%E2%80%9C%E4%BA%94%E4%B8%AA%E5%93%B2%E5%AD%A6%E5%AE%B6%E2%80%9D%E9%97%AE%E9%A2%98%E7%9A%84%E7%A8%8B%E5%BA%8F/">实验4 编制模拟“五个哲学家”问题的程序</a>
-          </li>
-        
-          <li>
-            <a href="/2021/11/28/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%B8%89%20Socket%E9%80%9A%E4%BF%A1%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/">《计算机网络与通信》课程实验三 Socket通信程序设计</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
-</aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      
-      &copy; 2022 Blackfankt<br>
-      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
-    </div>
-  </div>
-</footer>
-
-    </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
-    
-
-
-<script src="/js/jquery-3.4.1.min.js"></script>
-
-
-
-  
-<script src="/fancybox/jquery.fancybox.min.js"></script>
-
-
-
-
-<script src="/js/script.js"></script>
-
-
-
-
-
-  </div>
-</body>
-</html>
+block aside-block
+  - const tocContent = toc(page.content, theme.toc)
+  if tocContent.length > 0
+    h1 INDEX
+    #post-index!= tocContent

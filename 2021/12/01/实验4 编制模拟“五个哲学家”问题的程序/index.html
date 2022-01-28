@@ -1,273 +1,85 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  
-  
-  <title>实验4 编制模拟“五个哲学家”问题的程序 | Riceater</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="实验目的：学习和掌握并发进程同步的概念和方法。 实验内容：11、程序语法        philosopher   [ -t  &lt;time&gt; ] &lt;time&gt;是哲学家进餐和沉思的持续时间值，缺省值为2秒。2、五个哲学家的编号为0~4，分别用五个进程独立模拟。3、程序的输出要简洁，仅输出每个哲学家进餐和沉思的信息。 例如，当编号为3的哲学家在进餐时，就打印：        p">
-<meta property="og:type" content="article">
-<meta property="og:title" content="实验4 编制模拟“五个哲学家”问题的程序">
-<meta property="og:url" content="https://blackfankt.github.io/2021/12/01/%E5%AE%9E%E9%AA%8C4%20%E7%BC%96%E5%88%B6%E6%A8%A1%E6%8B%9F%E2%80%9C%E4%BA%94%E4%B8%AA%E5%93%B2%E5%AD%A6%E5%AE%B6%E2%80%9D%E9%97%AE%E9%A2%98%E7%9A%84%E7%A8%8B%E5%BA%8F/index.html">
-<meta property="og:site_name" content="Riceater">
-<meta property="og:description" content="实验目的：学习和掌握并发进程同步的概念和方法。 实验内容：11、程序语法        philosopher   [ -t  &lt;time&gt; ] &lt;time&gt;是哲学家进餐和沉思的持续时间值，缺省值为2秒。2、五个哲学家的编号为0~4，分别用五个进程独立模拟。3、程序的输出要简洁，仅输出每个哲学家进餐和沉思的信息。 例如，当编号为3的哲学家在进餐时，就打印：        p">
-<meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://blackfankt.github.io/2021/12/01/%E5%AE%9E%E9%AA%8C4%20%E7%BC%96%E5%88%B6%E6%A8%A1%E6%8B%9F%E2%80%9C%E4%BA%94%E4%B8%AA%E5%93%B2%E5%AD%A6%E5%AE%B6%E2%80%9D%E9%97%AE%E9%A2%98%E7%9A%84%E7%A8%8B%E5%BA%8F/image-20211202232319274.png">
-<meta property="og:image" content="https://blackfankt.github.io/2021/12/01/%E5%AE%9E%E9%AA%8C4%20%E7%BC%96%E5%88%B6%E6%A8%A1%E6%8B%9F%E2%80%9C%E4%BA%94%E4%B8%AA%E5%93%B2%E5%AD%A6%E5%AE%B6%E2%80%9D%E9%97%AE%E9%A2%98%E7%9A%84%E7%A8%8B%E5%BA%8F/image-20211202232452731.png">
-<meta property="article:published_time" content="2021-12-01T09:37:49.000Z">
-<meta property="article:modified_time" content="2022-01-28T02:16:24.945Z">
-<meta property="article:author" content="Blackfankt">
-<meta property="article:tag" content="Unix实验">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://blackfankt.github.io/2021/12/01/%E5%AE%9E%E9%AA%8C4%20%E7%BC%96%E5%88%B6%E6%A8%A1%E6%8B%9F%E2%80%9C%E4%BA%94%E4%B8%AA%E5%93%B2%E5%AD%A6%E5%AE%B6%E2%80%9D%E9%97%AE%E9%A2%98%E7%9A%84%E7%A8%8B%E5%BA%8F/image-20211202232319274.png">
-  
-    <link rel="alternate" href="/atom.xml" title="Riceater" type="application/atom+xml">
-  
-  
-    <link rel="shortcut icon" href="/favicon.png">
-  
-  
-    
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+extends includes/layout.pug
 
-  
-  
-<link rel="stylesheet" href="/css/style.css">
+block content
+  -
+    const prev = page.prev
+    const next = page.next
+    const dateConf = theme.post.date
+    const updatedConf = theme.post.updated
+    const sourceConf = theme.post.source
+    const excerptConf = theme.post.excerpt
+    const reward = theme.post.reward
+    const appID = theme.valine.app_id
+    const appKey = theme.valine.app_key
+    const tocContent = toc(page.content, theme.toc)
+  #post-bg
+    #post-title
+      if dateConf || updatedConf
+        #post-info
+          if dateConf
+            span date:
+              time(datetime=page.date.toJSON())#date
+                = ' ' + date(page.date, date_format)
+          if dateConf && updatedConf
+            br
+          if updatedConf
+            span updated:
+              time(datetime=page.updated.toJSON())#updated
+                = ' ' + date(page.updated, date_format)
+          if sourceConf
+            br
+            span#post-source Source File:
+              br
+              span= page.source
+      h1= page.title
+      hr
+    #post-content
+      if excerptConf
+        != page.content
+      else
+        != page.more
+      #paginator!= paginator()
+    #post-footer
+      if prev || next
+        hr
+      if prev !== undefined
+        a(href=url_for(prev.path))
+          |← Prev
+          =' ' + prev.title
+      if prev && next
+        <span style="color: #fe2"> | </span>
+      if next !== undefined
+        a(href=url_for(next.path))
+          =next.title + ' '
+          |Next →
+      if prev || next
+        hr
+    #bottom-btn
+      if tocContent.length > 0
+        a#to-index(href="#post-index" title="index") ≡
+      a#to-top(href="#post-title" title="to top") ∧
+    if reward === true
+      details#reward
+        summary 打赏
+        #alipay
+          span 支付宝 | Alipay
+          br
+          img(src= config.root + 'img/Alipay.png')
+        #wechat
+          span 微信 | WeChat
+          br
+          img(src= config.root + 'img/WeChat.png')
+    #Valine
+    script
+      |new Valine({
+      |  el: '#Valine'
+      |  , appId: '#{appID}'
+      |  , appKey: '#{appKey}'
+      |  , placeholder: '此条评论委托企鹅物流发送'
+      |})
 
-  
-    
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
-
-  
-<meta name="generator" content="Hexo 5.4.1"></head>
-
-<body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">Riceater</a>
-      </h1>
-      
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://Blackfankt.github.io"></form>
-      </div>
-    </div>
-  </div>
-</header>
-
-      <div class="outer">
-        <section id="main"><article id="post-实验4 编制模拟“五个哲学家”问题的程序" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2021/12/01/%E5%AE%9E%E9%AA%8C4%20%E7%BC%96%E5%88%B6%E6%A8%A1%E6%8B%9F%E2%80%9C%E4%BA%94%E4%B8%AA%E5%93%B2%E5%AD%A6%E5%AE%B6%E2%80%9D%E9%97%AE%E9%A2%98%E7%9A%84%E7%A8%8B%E5%BA%8F/" class="article-date">
-  <time class="dt-published" datetime="2021-12-01T09:37:49.000Z" itemprop="datePublished">2021-12-01</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="p-name article-title" itemprop="headline name">
-      实验4 编制模拟“五个哲学家”问题的程序
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h5 id="实验目的："><a href="#实验目的：" class="headerlink" title="实验目的："></a>实验目的：</h5><p>学习和掌握并发进程同步的概念和方法。</p>
-<h5 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h5><p>11、程序语法<br>        <code>philosopher   [ -t  &lt;time&gt; ]</code></p>
-<p><code>&lt;time&gt;</code>是哲学家进餐和沉思的持续时间值，缺省值为2秒。<br>2、五个哲学家的编号为0~4，分别用五个进程独立模拟。<br>3、程序的输出要简洁，仅输出每个哲学家进餐和沉思的信息。</p>
-<p>例如，当编号为3的哲学家在进餐时，就打印：<br>        <code>philosopher 3 is eating</code><br>而当他在沉思时，则打印：<br>         <code>philosopher 3 is thinking</code><br>除此之外不要输出其他任何信息。<br>4、利用课堂已教授的知识而不使用线程或IPC机制进行同步。</p>
-<p>5、程序应该一直运行，直到人为地终止它（按Ctrl-C或Ctrl-\）。不允许出现僵尸进程。<br>6、 12月3日24点为实验完成deadline。</p>
-<h5 id="实验准备："><a href="#实验准备：" class="headerlink" title="实验准备："></a>实验准备：</h5><p>首先了解一下什么是哲学家进餐问题：</p>
-<p>学家就餐问题可以这样表述，假设有五位哲学家围坐在一张圆形餐桌旁，做以下两件事情之一：吃饭，或者思考。吃东西的时候，他们就停止思考，思考的时候也停止吃东西。餐桌中间有一大碗意大利面，每两个哲学家之间有一只餐叉。因为用一只餐叉很难吃到意大利面，所以假设哲学家必须用两只餐叉吃东西。他们只能使用自己左右手边的那两只餐叉。哲学家就餐问题有时也用米饭和筷子而不是意大利面和餐叉来描述，因为很明显，吃米饭必须用两根筷子。</p>
-<p>哲学家从来不交谈，这就很危险，可能产生死锁，每个哲学家都拿着左手的餐叉，永远都在等右边的餐叉（或者相反）。即使没有死锁，也有可能发生资源耗尽。例如，假设规定当哲学家等待另一只餐叉超过五分钟后就放下自己手里的那一只餐叉，并且再等五分钟后进行下一次尝试。这个策略消除了死锁（系统总会进入到下一个状态），但仍然有可能发生“<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E6%B4%BB%E9%94%81">活锁</a>”。如果五位哲学家在完全相同的时刻进入餐厅，并同时拿起左边的餐叉，那么这些哲学家就会等待五分钟，同时放下手中的餐叉，再等五分钟，又同时拿起这些餐叉。</p>
-<p>在实际的计算机问题中，缺乏餐叉可以类比为缺乏共享资源。一种常用的计算机技术是资源加锁，用来保证在某个时刻，资源只能被一个程序或一段代码访问。当一个程序想要使用的资源已经被另一个程序锁定，它就等待资源解锁。当多个程序涉及到加锁的资源时，在某些情况下就有可能发生死锁。例如，某个程序需要访问两个文件，当两个这样的程序各锁了一个文件，那它们都在等待对方解锁另一个文件，而这永远不会发生。</p>
-<h5 id="实验设计思路："><a href="#实验设计思路：" class="headerlink" title="实验设计思路："></a>实验设计思路：</h5><p>看了看网上的思路，要解决哲学家进餐问题的核心应该是解决死锁情况，即：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">五个哲学家同时取他左边的叉子，每个人持有一只叉子一段时间，并在相同时间放下后又同时拿起左边的叉子。</span><br></pre></td></tr></table></figure>
-
-<p>解决这个问题的思路就是人为设定一个哲学家会去先拿右边的叉子。</p>
-<h6 id="实验代码："><a href="#实验代码：" class="headerlink" title="实验代码："></a>实验代码：</h6><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;apue.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">initlock</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *lockfile)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line"></span><br><span class="line">    unlink(lockfile);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">lock</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *lockfile)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> fd;</span><br><span class="line">    <span class="keyword">while</span> ((fd = open(lockfile, O_RDONLY | O_CREAT | O_EXCL, FILE_MODE)) &lt; <span class="number">0</span>)</span><br><span class="line">        sleep(<span class="number">1</span>);</span><br><span class="line">    close(fd);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">unlock</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *lockfile)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    unlink(lockfile);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 定义5个文件，分别表示5个叉子。其文件名可以按如下方式说明：</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> N 5</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">char</span> *forks[<span class="number">5</span>] = &#123;<span class="string">&quot;forks0&quot;</span>, <span class="string">&quot;forks1&quot;</span>, <span class="string">&quot;forks2&quot;</span>, <span class="string">&quot;forks3&quot;</span>, <span class="string">&quot;forks4&quot;</span>&#125;;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> nsecs = <span class="number">2</span>;</span><br><span class="line"><span class="comment">// 哲学家的行为可以用如下函数描述：</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">philosopher</span><span class="params">(<span class="keyword">int</span> i)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        thinking(i, nsecs); <span class="comment">// 哲学家i思考nsecs秒</span></span><br><span class="line">        takeFork(i);        <span class="comment">// 哲学家i拿起叉子</span></span><br><span class="line">        eating(i, nsecs);   <span class="comment">// 哲学家i进餐nsecs秒</span></span><br><span class="line">        putFork(i);         <span class="comment">// 哲学家i放下叉子</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 拿起叉子可以如此定义：</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">takeFork</span><span class="params">(i)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//假定第N-1位哲学家是右撇子</span></span><br><span class="line">    <span class="keyword">if</span> (i == N - <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        lock(forks[<span class="number">0</span>]);</span><br><span class="line">        lock(forks[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        lock(forks[i]);</span><br><span class="line">        lock(forks[i + <span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 放下叉子可以如此定义：</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">putFork</span><span class="params">(i)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (i == N - <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        unlock(forks[<span class="number">0</span>]);</span><br><span class="line">        unlock(forks[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        unlock(forks[i]);</span><br><span class="line">        unlock(forks[i + <span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">thinking</span><span class="params">(<span class="keyword">int</span> i, <span class="keyword">int</span> nsecs)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;philosopher %d is thinking \n&quot;</span>, i);</span><br><span class="line">    sleep(nsecs);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">eating</span><span class="params">(<span class="keyword">int</span> i, <span class="keyword">int</span> nsecs)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;philosopher %d is eating\n&quot;</span>, i);</span><br><span class="line">    sleep(nsecs);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">pid_t</span> pid;</span><br><span class="line">    <span class="comment">// 在主程序里，可以用下面的程序段生成5个哲学家进程：</span></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; N; i++)</span><br><span class="line">        initlock(forks[i]);</span><br><span class="line">    <span class="keyword">if</span> (argc == <span class="number">3</span> &amp;&amp; !<span class="built_in">strcmp</span>(argv[<span class="number">1</span>], <span class="string">&quot;-t&quot;</span>))</span><br><span class="line">        nsecs = atoi(argv[<span class="number">2</span>]);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (argc != <span class="number">1</span>)</span><br><span class="line">        err_quit(<span class="string">&quot;usage:philosopher [ -t &lt;time&gt; ]&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; N; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        pid = fork();</span><br><span class="line">        <span class="keyword">if</span> (pid == <span class="number">0</span>)</span><br><span class="line">            philosopher(i);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (pid &lt; <span class="number">0</span>)</span><br><span class="line">            err_quit(<span class="string">&quot;fork error&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    wait(<span class="literal">NULL</span>); <span class="comment">/* 注意，如果父进程不等待子进程的结束，那么需要终止程序运行时，就只能从控制台删除在后台运行的哲学家进程 */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h5 id="实验结果："><a href="#实验结果：" class="headerlink" title="实验结果："></a>实验结果：</h5><h6 id="源程序名：philosopher-c"><a href="#源程序名：philosopher-c" class="headerlink" title="源程序名：philosopher.c"></a>源程序名：philosopher.c</h6><h6 id="可执行程序名：philosopher"><a href="#可执行程序名：philosopher" class="headerlink" title="可执行程序名：philosopher"></a>可执行程序名：philosopher</h6><p>如何编译生成可执行程序：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc philosopher.c error_my.c -o philosopher：</span><br></pre></td></tr></table></figure>
-
-<p>程序执行过程：</p>
-<p><img src="/2021/12/01/%E5%AE%9E%E9%AA%8C4%20%E7%BC%96%E5%88%B6%E6%A8%A1%E6%8B%9F%E2%80%9C%E4%BA%94%E4%B8%AA%E5%93%B2%E5%AD%A6%E5%AE%B6%E2%80%9D%E9%97%AE%E9%A2%98%E7%9A%84%E7%A8%8B%E5%BA%8F/image-20211202232319274.png"></p>
-<p><img src="/2021/12/01/%E5%AE%9E%E9%AA%8C4%20%E7%BC%96%E5%88%B6%E6%A8%A1%E6%8B%9F%E2%80%9C%E4%BA%94%E4%B8%AA%E5%93%B2%E5%AD%A6%E5%AE%B6%E2%80%9D%E9%97%AE%E9%A2%98%E7%9A%84%E7%A8%8B%E5%BA%8F/image-20211202232452731.png"></p>
-<h5 id="实验体会与心得："><a href="#实验体会与心得：" class="headerlink" title="实验体会与心得："></a>实验体会与心得：</h5><p>这次实验我学会了如何用文件来实现各进程之间的交互，并且了解到了哲学家进餐这一计算机经典问题。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://blackfankt.github.io/2021/12/01/%E5%AE%9E%E9%AA%8C4%20%E7%BC%96%E5%88%B6%E6%A8%A1%E6%8B%9F%E2%80%9C%E4%BA%94%E4%B8%AA%E5%93%B2%E5%AD%A6%E5%AE%B6%E2%80%9D%E9%97%AE%E9%A2%98%E7%9A%84%E7%A8%8B%E5%BA%8F/" data-id="ckyxuljtw0005qow5fti2acqw" data-title="实验4 编制模拟“五个哲学家”问题的程序" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Unix%E5%AE%9E%E9%AA%8C/" rel="tag">Unix实验</a></li></ul>
-
-    </footer>
-  </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2021/12/14/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E5%9B%9B%20%E8%BF%90%E7%94%A8ns-3%E5%88%86%E6%9E%90%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">前一篇</strong>
-      <div class="article-nav-title">
-        
-          《计算机网络与通信》课程实验四 运用ns-3分析路由协议
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2021/11/28/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%B8%89%20Socket%E9%80%9A%E4%BF%A1%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">后一篇</strong>
-      <div class="article-nav-title">《计算机网络与通信》课程实验三 Socket通信程序设计</div>
-    </a>
-  
-</nav>
-
-  
-</article>
-
-
-</section>
-        
-          <aside id="sidebar">
-  
-    
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签</h3>
-    <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unix%E5%AE%9E%E9%AA%8C/" rel="tag">Unix实验</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E5%AE%9E%E9%AA%8C/" rel="tag">《计算机网络与通信》实验</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%99%E7%A8%8B/" rel="tag">教程</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签云</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/Unix%E5%AE%9E%E9%AA%8C/" style="font-size: 20px;">Unix实验</a> <a href="/tags/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E5%AE%9E%E9%AA%8C/" style="font-size: 20px;">《计算机网络与通信》实验</a> <a href="/tags/%E6%95%99%E7%A8%8B/" style="font-size: 10px;">教程</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">归档</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">十二月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/11/">十一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">七月 2021</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">最新文章</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2021/12/28/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%94%EF%BC%9A%E8%BF%90%E8%BE%93%E5%B1%82%E5%92%8C%E5%BA%94%E7%94%A8%E5%B1%82%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90/">《计算机网络与通信》课程实验五：运输层和应用层协议分析</a>
-          </li>
-        
-          <li>
-            <a href="/2021/12/19/%E5%AE%9E%E9%AA%8C5%20%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86/">实验5 信号处理</a>
-          </li>
-        
-          <li>
-            <a href="/2021/12/14/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E5%9B%9B%20%E8%BF%90%E7%94%A8ns-3%E5%88%86%E6%9E%90%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/">《计算机网络与通信》课程实验四 运用ns-3分析路由协议</a>
-          </li>
-        
-          <li>
-            <a href="/2021/12/01/%E5%AE%9E%E9%AA%8C4%20%E7%BC%96%E5%88%B6%E6%A8%A1%E6%8B%9F%E2%80%9C%E4%BA%94%E4%B8%AA%E5%93%B2%E5%AD%A6%E5%AE%B6%E2%80%9D%E9%97%AE%E9%A2%98%E7%9A%84%E7%A8%8B%E5%BA%8F/">实验4 编制模拟“五个哲学家”问题的程序</a>
-          </li>
-        
-          <li>
-            <a href="/2021/11/28/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%B8%89%20Socket%E9%80%9A%E4%BF%A1%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/">《计算机网络与通信》课程实验三 Socket通信程序设计</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
-</aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      
-      &copy; 2022 Blackfankt<br>
-      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
-    </div>
-  </div>
-</footer>
-
-    </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
-    
-
-
-<script src="/js/jquery-3.4.1.min.js"></script>
-
-
-
-  
-<script src="/fancybox/jquery.fancybox.min.js"></script>
-
-
-
-
-<script src="/js/script.js"></script>
-
-
-
-
-
-  </div>
-</body>
-</html>
+block aside-block
+  - const tocContent = toc(page.content, theme.toc)
+  if tocContent.length > 0
+    h1 INDEX
+    #post-index!= tocContent
