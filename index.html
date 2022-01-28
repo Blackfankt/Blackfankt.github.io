@@ -73,206 +73,6 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-实验2 目录树的遍历" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2022/01/27/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/" class="article-date">
-  <time class="dt-published" datetime="2022-01-27T09:37:49.000Z" itemprop="datePublished">2022-01-27</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2022/01/27/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/">实验2 目录树的遍历</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h5 id="实验目的："><a href="#实验目的：" class="headerlink" title="实验目的："></a>实验目的：</h5><p>掌握与文件和目录树有关的系统调用和库函数。</p>
-<h5 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h5><p>1、编写程序myfind<br>命令语法：<br>        myfind  <pathname>  [-comp <filename> | -name <str>…]<br>命令语义：<br>（1）myfind  <pathname> 的功能：<br>除了具有与程序4-7相同的功能外，还要输出在<pathname>目录子树之下，文件长度不大于4096字节的常规文件，在所有允许访问的普通文件中所占的百分比。程序不允许打印出任何路径名。<br>（2）myfind  <pathname>  -comp  <filename>的功能：<br><filename>是常规文件的路径名（非目录名，但是其路径可以包含目录）。命令仅仅输出在<pathname>目录子树之下，所有与<filename>文件内容一致的文件的绝对路径名。不允许输出任何其它的路径名，包括不可访问的路径名。</filename></pathname></filename></filename></pathname></pathname></pathname></str></filename></pathname></p>
-<p>（3）myfind  <pathname>  -name <str>…的功能：<br><str>…是一个以空格分隔的文件名序列(不带路径)。命令输出在<pathname>目录子树之下，所有与<str>…序列中文件名相同的文件的绝对路径名。不允许输出不可访问的或无关的路径名。<br>       <pathname>和<filename>均既可以是绝对路径名，也可以是相对路径名。<pathname>既可以是目录，也可以是文件，此时，目录为当前工作目录。</pathname></filename></pathname></str></pathname></str></str></pathname></p>
-<p>2、注意尽可能地提高程序的效率。注意避免因打开太多文件而产生的错误。</p>
-<p>3、遍历目录树时，访问结点（目录项）的具体操作应当由遍历函数dopath携带的函数指针参数决定。这样程序的结构清晰，可扩充性好。</p>
-<h5 id="实验设计思路："><a href="#实验设计思路：" class="headerlink" title="实验设计思路："></a>实验设计思路：</h5><p>在书上例子的基础上实现功能的增加。具体方案如下：</p>
-<p>功能1函数：（只需要在原本的myfunc函数中加入检测文件大小的内容即可）</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span></span></span><br><span class="line"><span class="function"><span class="title">myfuncExtra</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">const</span> struct stat *statptr, <span class="keyword">int</span> type)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">switch</span> (type)</span><br><span class="line">	&#123;</span><br><span class="line">	<span class="keyword">case</span> FTW_F:</span><br><span class="line">		<span class="keyword">switch</span> (statptr-&gt;st_mode &amp; S_IFMT)</span><br><span class="line">		&#123;</span><br><span class="line">		<span class="keyword">case</span> S_IFREG:</span><br><span class="line">			nreg++;</span><br><span class="line">			<span class="keyword">if</span> (statptr-&gt;st_size &lt;= <span class="number">4096</span>)</span><br><span class="line">				n4096++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFBLK:</span><br><span class="line">			nblk++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFCHR:</span><br><span class="line">			nchr++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFIFO:</span><br><span class="line">			nfifo++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFLNK:</span><br><span class="line">			nslink++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFSOCK:</span><br><span class="line">			nsock++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFDIR:;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">case</span> FTW_D:</span><br><span class="line">		ndir++;</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">case</span> FTW_DNR:</span><br><span class="line"></span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">case</span> FTW_NS:</span><br><span class="line"></span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">default</span>:;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> (<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>功能2函数：(通过一些库函数调用读取文件后直接比较文件内容即可,同时为避免打开太多文件，直接先通过比较文件大小来确定是否继续比较文件内容)</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span></span></span><br><span class="line"><span class="function"><span class="title">myfuncCompareContent</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">const</span> struct stat *statptr, <span class="keyword">int</span> type)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (type == FTW_F &amp;&amp; (statptr-&gt;st_mode &amp; S_IFMT) == S_IFREG &amp;&amp; statptr-&gt;st_size == filesize)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> fd;</span><br><span class="line">		<span class="keyword">if</span> ((fd = open(pathname, O_RDONLY, FILE_MODE)) == <span class="number">-1</span>)</span><br><span class="line"></span><br><span class="line">			<span class="keyword">return</span> (<span class="number">0</span>);</span><br><span class="line">		<span class="keyword">if</span> (read(fd, comparebuf, filesize) != filesize)</span><br><span class="line">			err_sys(<span class="string">&quot;read error &#x27;%s&#x27;\n&quot;</span>, pathname);</span><br><span class="line">		close(fd);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (<span class="built_in">strcmp</span>(filebuf, comparebuf) == <span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> (<span class="built_in">strcmp</span>(inputfilepath, pathname) != <span class="number">0</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				filefindcount++;</span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, pathname);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> (<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>功能3函数：(提取文件名后进行查找比较)</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span></span></span><br><span class="line"><span class="function"><span class="title">myfuncCompareName</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">const</span> struct stat *statptr, <span class="keyword">int</span> type)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (type == FTW_F)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> pos;</span><br><span class="line">		pos = getFileNamePos(pathname);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (<span class="built_in">strcmp</span>(inputfilename, pathname + pos) == <span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			filefindcount++;</span><br><span class="line">			<span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, pathname);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> (<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>功能实现函数如上，还有一些例如提取文件名功能的函数则直接不放在报告里了。</p>
-<p>使用不同功能的命令语法则同样是通过argc和argv来完成。</p>
-<h5 id="实验结果："><a href="#实验结果：" class="headerlink" title="实验结果："></a>实验结果：</h5><h6 id="源程序名：myfind-c"><a href="#源程序名：myfind-c" class="headerlink" title="源程序名：myfind.c"></a>源程序名：myfind.c</h6><h6 id="可执行程序名：myfind"><a href="#可执行程序名：myfind" class="headerlink" title="可执行程序名：myfind"></a>可执行程序名：myfind</h6><p>如何编译生成可执行程序：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gcc myfind.c -o myfind</span><br></pre></td></tr></table></figure>
-
-<p>功能1：</p>
-<p><img src="/2022/01/27/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/image-20211030231010931.png"></p>
-<p>功能2：</p>
-<p><img src="/2022/01/27/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/image-20211030231053103.png"></p>
-<p><img src="/2022/01/27/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/image-20211030231207598.png"></p>
-<p>功能3：</p>
-<p><img src="/2022/01/27/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/image-20211030231247119.png"></p>
-<p><img src="/2022/01/27/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/image-20211030231258458.png"></p>
-<h5 id="实验体会与心得："><a href="#实验体会与心得：" class="headerlink" title="实验体会与心得："></a>实验体会与心得：</h5><p>对文件的操作更加熟悉了一些，同时也接触到了一些库函数以及库函数的参数，不过在写代码的时候也遇到了一些不熟悉的地方，比如将FLIE_MODE写成了FILE_MOD报错未定义，然后一直去网上搜索怎么解决，最后才发现是少打了一个字母。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://blackfankt.github.io/2022/01/27/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/" data-id="ckyxrebqk00020sw5hgrtced8" data-title="实验2 目录树的遍历" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Unix%E5%AE%9E%E9%AA%8C/" rel="tag">Unix实验</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-《计算机网络与通信》课程实验二" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/" class="article-date">
-  <time class="dt-published" datetime="2022-01-26T09:37:49.000Z" itemprop="datePublished">2022-01-26</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/">《计算机网络与通信》课程实验二</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h3 id="实验目的"><a href="#实验目的" class="headerlink" title="实验目的"></a>实验目的</h3><p> 学习捕获和分析网络数据包</p>
-<p>掌握以太网MAC帧、802.11数据帧和IPv4数据包的构成，了解各字段的含义</p>
-<p>掌握ICMP协议，ping和tracert指令的工作原理</p>
-<p>掌握ARP协议的请求/响应机理</p>
-<h3 id="实验内容"><a href="#实验内容" class="headerlink" title="实验内容"></a>实验内容</h3><p>任务1：捕获和分析有线以太网数据包</p>
-<h6 id="ping命令："><a href="#ping命令：" class="headerlink" title="ping命令："></a>ping命令：</h6><p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102145228682.png"></p>
-<h6 id="ipconfig命令："><a href="#ipconfig命令：" class="headerlink" title="ipconfig命令："></a>ipconfig命令：</h6><p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102145944883.png"></p>
-<h6 id="过滤出于本机ip相关的数据："><a href="#过滤出于本机ip相关的数据：" class="headerlink" title="过滤出于本机ip相关的数据："></a>过滤出于本机ip相关的数据：</h6><p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102150252508.png"></p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102150330348.png"></p>
-<h5 id="1-1-观察MAC帧格式"><a href="#1-1-观察MAC帧格式" class="headerlink" title="1.1 观察MAC帧格式"></a>1.1 观察MAC帧格式</h5><p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102151213440.png"></p>
-<p>如上图所示，蓝标部分为MAC帧。</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102151256100.png"></p>
-<p>上图中蓝标部分为目标地址</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102151409611.png"></p>
-<p>上图中蓝标部分为源地址</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102151436938.png"></p>
-<p>上图中蓝标部分为“类型”字段，意为IPv4类型</p>
-<h5 id="1-2-观察IP数据包的首部结构"><a href="#1-2-观察IP数据包的首部结构" class="headerlink" title="1.2 观察IP数据包的首部结构"></a>1.2 观察IP数据包的首部结构</h5><p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102151949670.png"></p>
-<p>上图蓝标部分为IP数据报结构</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102152253441.png"></p>
-<p>上图蓝标部分中的4H（0100B）为版本号</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102152325735.png"></p>
-<p>上述蓝标部分中的5H（0101B）为首部长度</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102152637881.png"></p>
-<p>上图中的蓝标部分为服务类型</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102152731240.png"></p>
-<p>上图中的蓝标部分为总长度</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102152836192.png"></p>
-<p>上图中的蓝标部分为标识</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102152901792.png"></p>
-<p>上图中的蓝标部分为标志位</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102153029050.png"></p>
-<p>上图中的蓝标部分为片偏移</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102153103874.png"></p>
-<p>上图中的蓝标部分为生存时间（TTL）</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102153128688.png"></p>
-<p>上图中的蓝标部分为协议</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102153149488.png"></p>
-<p>上图中的蓝标部分为首部检验和</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102153229313.png"></p>
-<p>上图中的蓝标部分为源IP地址</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102153258487.png"></p>
-<p>上图中的蓝标部分为目的IP地址</p>
-<h5 id="1-3-IP数据报分片"><a href="#1-3-IP数据报分片" class="headerlink" title="1.3 IP数据报分片"></a>1.3 IP数据报分片</h5><p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102153816264.png"></p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102154540328.png"></p>
-<p>终端窗口发送的是3000字节，抓包数据显示的是分成3段发送，字节长度分别是1480、 1480、 48，总共为3008字节</p>
-<h5 id="1-4-解释ICMP报文"><a href="#1-4-解释ICMP报文" class="headerlink" title="1.4 解释ICMP报文"></a>1.4 解释ICMP报文</h5><p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102155443631.png"></p>
-<p>可以看出Ping一次一共有4个请求帧和4个回应帧。</p>
-<p>请求帧与回应帧的差别：</p>
-<p>Tpye字段不同：请求帧的Tpye字段为8，回应帧的Tpye字段为0；</p>
-<p>检验和不同。</p>
-<p>对应IP头部的变化：</p>
-<p>源地址IP和地址IP交换；</p>
-<p>TTL发生变换；</p>
-<p>首部校验和发生变换</p>
-<h5 id="1-5-tracert命令"><a href="#1-5-tracert命令" class="headerlink" title="1.5 tracert命令"></a>1.5 tracert命令</h5><p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102160756935.png"></p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102160905618.png"></p>
-<h6 id="tracert工作原理："><a href="#tracert工作原理：" class="headerlink" title="tracert工作原理："></a>tracert工作原理：</h6><p>tracert 命令用 IP 生存时间 (TTL) 字段和 ICMP 错误消息来确定从一个主机到网络上其他主机的路由。</p>
-<p>首先，tracert送出一个TTL是1的IP 数据包到目的地，当路径上的第一个路由器收到这个数据包时，它将TTL减1。此时，TTL变为0，所以该路由器会将此数据包丢掉，并送回一个「ICMP time exceeded」消息（包括发IP包的源地址，IP包的所有内容及路由器的IP地址），tracert 收到这个消息后，便知道这个路由器存在于这个路径上，接着tracert 再送出另一个TTL是2 的数据包，发现第2 个路由器…… tracert 每次将送出的数据包的TTL 加1来发现另一个路由器，这个重复的动作一直持续到某个数据包 抵达目的地。当数据包到达目的地后，该主机则不会送回ICMP time exceeded消息，一旦到达目的地，由于tracert通过UDP数据包向不常见端口(30000以上)发送数据包，因此会收到「ICMP port unreachable」消息，故可判断到达目的地。</p>
-<p>tracert 有一个固定的时间等待响应(ICMP TTL到期消息)。如果这个时间过了，它将打印出一系列的*号表明：在这个路径上，这个设备不能在给定的时间内发出ICMP TTL到期消息的响应。然后，Tracert给TTL记数器加1，继续进行。</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102162510242.png"></p>
-<p>除了中间那个黑色的，其他的为tracert发送的数据包（TTL递增）</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102162615367.png"></p>
-<p>以上为tracert接受的数据包</p>
-<h6 id="示意图："><a href="#示意图：" class="headerlink" title="示意图："></a>示意图：</h6><p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/74B4508220003D79327242E94DFBEA1B.png"></p>
-<h5 id="1-6-ARP协议分析"><a href="#1-6-ARP协议分析" class="headerlink" title="1.6 ARP协议分析"></a>1.6 ARP协议分析</h5><p>ping局域网内：</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102163452918.png"></p>
-<p>ping局域网外：</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102163506372.png"></p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165313988.png"></p>
-<p>上图蓝标部分为ARP请求包</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165358876.png"></p>
-<p>上图蓝标部分为硬件类型</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165426619.png"></p>
-<p>上图蓝标部分为协议类型</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165452915.png"></p>
-<p>上图蓝标部分为硬件地址长度</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165600044.png"></p>
-<p>上图蓝标部分为协议地址长度</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165626786.png"></p>
-<p>上图蓝标部分为操作码，其中1为ARP请求包</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165708915.png"></p>
-<p>上图蓝标部分为发送端MAC地址</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165758051.png"></p>
-<p>上图蓝标部分为发送端IP地址</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165849922.png"></p>
-<p>上图蓝标部分为接收端MAC地址</p>
-<p><img src="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165914314.png"></p>
-<p>上图蓝标部分为接收端IP地址</p>
-<p>ARP请求与响应过程<br>（1）当主机PC1想发送数据给主机PC2时，首先在自己的本地ARP缓存表中检查主机PC2匹配的MAC地址；<br>（2）如果主机PC1在缓存表中没有找到相应的条目，便将ARP请求帧广播到本地网络上的所有主机。该帧中包括源主机PC1的IP地址和MAC地址。本地网络上的每台主机都接收到ARP请求并且检查是否与自己的IP地址匹配。如果主机发现请求的IP地址与自己的不匹配，则将丢弃ARP请求；<br>（3）主机PC2发现请求的IP地址与自己的匹配，则将PC1的IP地址和MAC地址添加到本地缓存表；<br>（4）主机PC2将包含其MAC地址的ARP回复消息直接发送给主机PC1（单播）<br>（5）主机PC1接收到主机PC2的ARP回复消息时，将主机PC2的IP地址和MAC地址添加到自己的本地缓存表。本机缓存是有生存期的，默认ARP缓存的生存周期为120s。主机PC2的MAC地址一旦确定，主机PC1就可以向主机PC2发送IP消息了；</p>
-<p>所以我们看到抓包过程并没有我们之前ping <a target="_blank" rel="noopener" href="http://www.baidu.com的包/">www.baidu.com的包</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://blackfankt.github.io/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/" data-id="ckyxrebqj00010sw5301h3760" data-title="《计算机网络与通信》课程实验二" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E5%AE%9E%E9%AA%8C/" rel="tag">《计算机网络与通信》实验</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
     <article id="post-hello-world" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2021/12/21/hello-world/" class="article-date">
@@ -312,10 +112,280 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://blackfankt.github.io/2021/12/21/hello-world/" data-id="ckyxrebqe00000sw51oyf6mw0" data-title="Hello World" class="article-share-link">分享</a>
+      <a data-url="https://blackfankt.github.io/2021/12/21/hello-world/" data-id="ckyxrtlsh0000ecw5ccd0dfk8" data-title="Hello World" class="article-share-link">分享</a>
       
       
       
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-实验3 简单shell的设计和实现" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/11/14/%E5%AE%9E%E9%AA%8C3%20%E7%AE%80%E5%8D%95shell%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%AE%9E%E7%8E%B0/" class="article-date">
+  <time class="dt-published" datetime="2021-11-14T09:37:49.000Z" itemprop="datePublished">2021-11-14</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/11/14/%E5%AE%9E%E9%AA%8C3%20%E7%AE%80%E5%8D%95shell%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%AE%9E%E7%8E%B0/">实验3 简单shell的设计和实现</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h3 id="实验目的"><a href="#实验目的" class="headerlink" title="实验目的"></a>实验目的</h3><hr>
+<p>1.练习使用编程环境，包括shell的命令，vi和gcc编译器。<br>2.体会进程概念，了解fork，execve，wait等系统调用。</p>
+<h3 id="实验要求"><a href="#实验要求" class="headerlink" title="实验要求"></a>实验要求</h3><hr>
+<p>1.除了系统调用execve，不允许使用其他的exec函数。输入应当允许带多个参数(一行内可以表示)，不考虑通配符 (即“*”、“?”、“-”等等)的处理。<br>2.输入错误命令能提示出错并进入下一轮接收命令状态。<br>3.可以用Ctrl-C和Ctrl-\结束简单shell的运行。<br>4.程序运行正确，提示简洁明确。<br>5.实验提交文件为：实验报告、源程序、可执行程序。</p>
+<h3 id="实验思路："><a href="#实验思路：" class="headerlink" title="实验思路："></a>实验思路：</h3><hr>
+<p>模拟Shell环境的重要操作就是要读取用户输入的命令。</p>
+<p>而用fgets函数读取输入后得到一个字符串，需要将该字符串转化为可以供execve使用的字符数组。</p>
+<p>而Shell环境下的命令和参数都是以空格作为分隔，回车作为结尾，所以可以直接通过将回车和空格变成0来作处理。<br>然后通过fork（）函数创建和使用子进程即可。</p>
+<p>最后利用waitpid等待子进程结束即可。</p>
+<h3 id="实验代码"><a href="#实验代码" class="headerlink" title="实验代码"></a>实验代码</h3><hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&quot;apue.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> buf[MAXLINE];</span><br><span class="line">    <span class="keyword">pid_t</span> pid;</span><br><span class="line">    <span class="keyword">int</span> status;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;模拟[cs194108@mcore 3]$ &quot;</span>);</span><br><span class="line">    <span class="keyword">while</span>(fgets(buf,MAXLINE,<span class="built_in">stdin</span>) != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(buf[<span class="built_in">strlen</span>(buf) - <span class="number">1</span>] == <span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">            buf[<span class="built_in">strlen</span>(buf) - <span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span>((pid = fork()) &lt; <span class="number">0</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            err_sys(<span class="string">&quot;fork error&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//处于子进程中</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(pid == <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">char</span> *argv[<span class="number">100</span>];</span><br><span class="line">            <span class="keyword">int</span> i = <span class="number">0</span>,len = <span class="built_in">strlen</span>(buf),index = <span class="number">0</span>;</span><br><span class="line">            <span class="comment">//处理开头的空格</span></span><br><span class="line">            <span class="keyword">while</span>(buf[i] = <span class="string">&#x27; &#x27;</span>)i++;</span><br><span class="line">            argv[index++] = buf + i;</span><br><span class="line">            <span class="comment">//将输入用户指令以空格为分界线分别存入argv数组中</span></span><br><span class="line">            <span class="keyword">for</span>(; i &lt; len ; i++)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span>(buf[i] = <span class="string">&#x27; &#x27;</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    buf[i] = <span class="number">0</span>;</span><br><span class="line">                    <span class="keyword">if</span>(buf[i + <span class="number">1</span>] != <span class="string">&#x27; &#x27;</span>)</span><br><span class="line">                    &#123;</span><br><span class="line">                        argv[index++] = &amp;buf[i + <span class="number">1</span>];</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            argv[index] = <span class="literal">NULL</span>;</span><br><span class="line">            execve(argv[<span class="number">0</span>],argv,<span class="literal">NULL</span>);</span><br><span class="line">            err_ret(<span class="string">&quot;execute: %s&quot;</span>,buf);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">127</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>((pid = waitpid(pid,&amp;status,<span class="number">0</span>)) &lt; <span class="number">0</span>)</span><br><span class="line">            err_sys(<span class="string">&quot;waitpid error&quot;</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;模拟[cs194108@mcore 3]$ &quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><hr>
+<p>编译源文件：</p>
+<p><img src="/2021/11/14/%E5%AE%9E%E9%AA%8C3%20%E7%AE%80%E5%8D%95shell%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%AE%9E%E7%8E%B0/image-20220128100612684.png"></p>
+<p>启动shell程序：</p>
+<p><img src="/2021/11/14/%E5%AE%9E%E9%AA%8C3%20%E7%AE%80%E5%8D%95shell%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%AE%9E%E7%8E%B0/image-20220128100633187.png"></p>
+<p>运行ls命令：</p>
+<p><img src="/2021/11/14/%E5%AE%9E%E9%AA%8C3%20%E7%AE%80%E5%8D%95shell%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%AE%9E%E7%8E%B0/image-20220128100642412.png"></p>
+<p>​                    报错是因为ls命令在bin目录下</p>
+<p>运行/bin/ls 及/bin/ls - l:</p>
+<p><img src="/2021/11/14/%E5%AE%9E%E9%AA%8C3%20%E7%AE%80%E5%8D%95shell%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%AE%9E%E7%8E%B0/image-20220128100653442.png"></p>
+<p>运行/bin/touch 4108.txt：</p>
+<p><img src="/2021/11/14/%E5%AE%9E%E9%AA%8C3%20%E7%AE%80%E5%8D%95shell%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%AE%9E%E7%8E%B0/image-20220128100704394.png"></p>
+<p>利用Ctrl+\退出：</p>
+<p><img src="/2021/11/14/%E5%AE%9E%E9%AA%8C3%20%E7%AE%80%E5%8D%95shell%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%AE%9E%E7%8E%B0/image-20220128100712586.png"></p>
+<p>利用Ctrl+C退出：</p>
+<p><img src="/2021/11/14/%E5%AE%9E%E9%AA%8C3%20%E7%AE%80%E5%8D%95shell%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%AE%9E%E7%8E%B0/image-20220128100722322.png"></p>
+<h3 id="实验体会与心得"><a href="#实验体会与心得" class="headerlink" title="实验体会与心得"></a>实验体会与心得</h3><hr>
+<p>本次实验我认识并学习了函数fork（）、execve（）、waitpid（）。在理解了这几个函数的用法以后，理清楚本次实验要求需要做些什么，便可以将实验完成。让我觉得最新奇的是fork（）函数，能够在一个程序里创建一个子进程，差不多可以让一个程序一直运行下去，这样的函数确实是第一次认识到。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blackfankt.github.io/2021/11/14/%E5%AE%9E%E9%AA%8C3%20%E7%AE%80%E5%8D%95shell%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%AE%9E%E7%8E%B0/" data-id="ckyxrtlsy0004ecw5282a5eld" data-title="实验3 简单shell的设计和实现" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Unix%E5%AE%9E%E9%AA%8C/" rel="tag">Unix实验</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-《计算机网络与通信》课程实验二" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/" class="article-date">
+  <time class="dt-published" datetime="2021-11-12T09:37:49.000Z" itemprop="datePublished">2021-11-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/">《计算机网络与通信》课程实验二</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h3 id="实验目的"><a href="#实验目的" class="headerlink" title="实验目的"></a>实验目的</h3><p> 学习捕获和分析网络数据包</p>
+<p>掌握以太网MAC帧、802.11数据帧和IPv4数据包的构成，了解各字段的含义</p>
+<p>掌握ICMP协议，ping和tracert指令的工作原理</p>
+<p>掌握ARP协议的请求/响应机理</p>
+<h3 id="实验内容"><a href="#实验内容" class="headerlink" title="实验内容"></a>实验内容</h3><p>任务1：捕获和分析有线以太网数据包</p>
+<h6 id="ping命令："><a href="#ping命令：" class="headerlink" title="ping命令："></a>ping命令：</h6><p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102145228682.png"></p>
+<h6 id="ipconfig命令："><a href="#ipconfig命令：" class="headerlink" title="ipconfig命令："></a>ipconfig命令：</h6><p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102145944883.png"></p>
+<h6 id="过滤出于本机ip相关的数据："><a href="#过滤出于本机ip相关的数据：" class="headerlink" title="过滤出于本机ip相关的数据："></a>过滤出于本机ip相关的数据：</h6><p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102150252508.png"></p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102150330348.png"></p>
+<h5 id="1-1-观察MAC帧格式"><a href="#1-1-观察MAC帧格式" class="headerlink" title="1.1 观察MAC帧格式"></a>1.1 观察MAC帧格式</h5><p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102151213440.png"></p>
+<p>如上图所示，蓝标部分为MAC帧。</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102151256100.png"></p>
+<p>上图中蓝标部分为目标地址</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102151409611.png"></p>
+<p>上图中蓝标部分为源地址</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102151436938.png"></p>
+<p>上图中蓝标部分为“类型”字段，意为IPv4类型</p>
+<h5 id="1-2-观察IP数据包的首部结构"><a href="#1-2-观察IP数据包的首部结构" class="headerlink" title="1.2 观察IP数据包的首部结构"></a>1.2 观察IP数据包的首部结构</h5><p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102151949670.png"></p>
+<p>上图蓝标部分为IP数据报结构</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102152253441.png"></p>
+<p>上图蓝标部分中的4H（0100B）为版本号</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102152325735.png"></p>
+<p>上述蓝标部分中的5H（0101B）为首部长度</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102152637881.png"></p>
+<p>上图中的蓝标部分为服务类型</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102152731240.png"></p>
+<p>上图中的蓝标部分为总长度</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102152836192.png"></p>
+<p>上图中的蓝标部分为标识</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102152901792.png"></p>
+<p>上图中的蓝标部分为标志位</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102153029050.png"></p>
+<p>上图中的蓝标部分为片偏移</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102153103874.png"></p>
+<p>上图中的蓝标部分为生存时间（TTL）</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102153128688.png"></p>
+<p>上图中的蓝标部分为协议</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102153149488.png"></p>
+<p>上图中的蓝标部分为首部检验和</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102153229313.png"></p>
+<p>上图中的蓝标部分为源IP地址</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102153258487.png"></p>
+<p>上图中的蓝标部分为目的IP地址</p>
+<h5 id="1-3-IP数据报分片"><a href="#1-3-IP数据报分片" class="headerlink" title="1.3 IP数据报分片"></a>1.3 IP数据报分片</h5><p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102153816264.png"></p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102154540328.png"></p>
+<p>终端窗口发送的是3000字节，抓包数据显示的是分成3段发送，字节长度分别是1480、 1480、 48，总共为3008字节</p>
+<h5 id="1-4-解释ICMP报文"><a href="#1-4-解释ICMP报文" class="headerlink" title="1.4 解释ICMP报文"></a>1.4 解释ICMP报文</h5><p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102155443631.png"></p>
+<p>可以看出Ping一次一共有4个请求帧和4个回应帧。</p>
+<p>请求帧与回应帧的差别：</p>
+<p>Tpye字段不同：请求帧的Tpye字段为8，回应帧的Tpye字段为0；</p>
+<p>检验和不同。</p>
+<p>对应IP头部的变化：</p>
+<p>源地址IP和地址IP交换；</p>
+<p>TTL发生变换；</p>
+<p>首部校验和发生变换</p>
+<h5 id="1-5-tracert命令"><a href="#1-5-tracert命令" class="headerlink" title="1.5 tracert命令"></a>1.5 tracert命令</h5><p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102160756935.png"></p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102160905618.png"></p>
+<h6 id="tracert工作原理："><a href="#tracert工作原理：" class="headerlink" title="tracert工作原理："></a>tracert工作原理：</h6><p>tracert 命令用 IP 生存时间 (TTL) 字段和 ICMP 错误消息来确定从一个主机到网络上其他主机的路由。</p>
+<p>首先，tracert送出一个TTL是1的IP 数据包到目的地，当路径上的第一个路由器收到这个数据包时，它将TTL减1。此时，TTL变为0，所以该路由器会将此数据包丢掉，并送回一个「ICMP time exceeded」消息（包括发IP包的源地址，IP包的所有内容及路由器的IP地址），tracert 收到这个消息后，便知道这个路由器存在于这个路径上，接着tracert 再送出另一个TTL是2 的数据包，发现第2 个路由器…… tracert 每次将送出的数据包的TTL 加1来发现另一个路由器，这个重复的动作一直持续到某个数据包 抵达目的地。当数据包到达目的地后，该主机则不会送回ICMP time exceeded消息，一旦到达目的地，由于tracert通过UDP数据包向不常见端口(30000以上)发送数据包，因此会收到「ICMP port unreachable」消息，故可判断到达目的地。</p>
+<p>tracert 有一个固定的时间等待响应(ICMP TTL到期消息)。如果这个时间过了，它将打印出一系列的*号表明：在这个路径上，这个设备不能在给定的时间内发出ICMP TTL到期消息的响应。然后，Tracert给TTL记数器加1，继续进行。</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102162510242.png"></p>
+<p>除了中间那个黑色的，其他的为tracert发送的数据包（TTL递增）</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102162615367.png"></p>
+<p>以上为tracert接受的数据包</p>
+<h6 id="示意图："><a href="#示意图：" class="headerlink" title="示意图："></a>示意图：</h6><p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/74B4508220003D79327242E94DFBEA1B.png"></p>
+<h5 id="1-6-ARP协议分析"><a href="#1-6-ARP协议分析" class="headerlink" title="1.6 ARP协议分析"></a>1.6 ARP协议分析</h5><p>ping局域网内：</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102163452918.png"></p>
+<p>ping局域网外：</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102163506372.png"></p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165313988.png"></p>
+<p>上图蓝标部分为ARP请求包</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165358876.png"></p>
+<p>上图蓝标部分为硬件类型</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165426619.png"></p>
+<p>上图蓝标部分为协议类型</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165452915.png"></p>
+<p>上图蓝标部分为硬件地址长度</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165600044.png"></p>
+<p>上图蓝标部分为协议地址长度</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165626786.png"></p>
+<p>上图蓝标部分为操作码，其中1为ARP请求包</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165708915.png"></p>
+<p>上图蓝标部分为发送端MAC地址</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165758051.png"></p>
+<p>上图蓝标部分为发送端IP地址</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165849922.png"></p>
+<p>上图蓝标部分为接收端MAC地址</p>
+<p><img src="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/image-20211102165914314.png"></p>
+<p>上图蓝标部分为接收端IP地址</p>
+<p>ARP请求与响应过程<br>（1）当主机PC1想发送数据给主机PC2时，首先在自己的本地ARP缓存表中检查主机PC2匹配的MAC地址；<br>（2）如果主机PC1在缓存表中没有找到相应的条目，便将ARP请求帧广播到本地网络上的所有主机。该帧中包括源主机PC1的IP地址和MAC地址。本地网络上的每台主机都接收到ARP请求并且检查是否与自己的IP地址匹配。如果主机发现请求的IP地址与自己的不匹配，则将丢弃ARP请求；<br>（3）主机PC2发现请求的IP地址与自己的匹配，则将PC1的IP地址和MAC地址添加到本地缓存表；<br>（4）主机PC2将包含其MAC地址的ARP回复消息直接发送给主机PC1（单播）<br>（5）主机PC1接收到主机PC2的ARP回复消息时，将主机PC2的IP地址和MAC地址添加到自己的本地缓存表。本机缓存是有生存期的，默认ARP缓存的生存周期为120s。主机PC2的MAC地址一旦确定，主机PC1就可以向主机PC2发送IP消息了；</p>
+<p>所以我们看到抓包过程并没有我们之前ping <a target="_blank" rel="noopener" href="http://www.baidu.com的包/">www.baidu.com的包</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blackfankt.github.io/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/" data-id="ckyxrtlsm0001ecw53ujt70mc" data-title="《计算机网络与通信》课程实验二" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E5%AE%9E%E9%AA%8C/" rel="tag">《计算机网络与通信》实验</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-实验2 目录树的遍历" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/10/22/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/" class="article-date">
+  <time class="dt-published" datetime="2021-10-22T09:37:49.000Z" itemprop="datePublished">2021-10-22</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/10/22/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/">实验2 目录树的遍历</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h5 id="实验目的："><a href="#实验目的：" class="headerlink" title="实验目的："></a>实验目的：</h5><p>掌握与文件和目录树有关的系统调用和库函数。</p>
+<h5 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h5><p>1、编写程序myfind<br>命令语法：<br>        myfind  <pathname>  [-comp <filename> | -name <str>…]<br>命令语义：<br>（1）myfind  <pathname> 的功能：<br>除了具有与程序4-7相同的功能外，还要输出在<pathname>目录子树之下，文件长度不大于4096字节的常规文件，在所有允许访问的普通文件中所占的百分比。程序不允许打印出任何路径名。<br>（2）myfind  <pathname>  -comp  <filename>的功能：<br><filename>是常规文件的路径名（非目录名，但是其路径可以包含目录）。命令仅仅输出在<pathname>目录子树之下，所有与<filename>文件内容一致的文件的绝对路径名。不允许输出任何其它的路径名，包括不可访问的路径名。</filename></pathname></filename></filename></pathname></pathname></pathname></str></filename></pathname></p>
+<p>（3）myfind  <pathname>  -name <str>…的功能：<br><str>…是一个以空格分隔的文件名序列(不带路径)。命令输出在<pathname>目录子树之下，所有与<str>…序列中文件名相同的文件的绝对路径名。不允许输出不可访问的或无关的路径名。<br>       <pathname>和<filename>均既可以是绝对路径名，也可以是相对路径名。<pathname>既可以是目录，也可以是文件，此时，目录为当前工作目录。</pathname></filename></pathname></str></pathname></str></str></pathname></p>
+<p>2、注意尽可能地提高程序的效率。注意避免因打开太多文件而产生的错误。</p>
+<p>3、遍历目录树时，访问结点（目录项）的具体操作应当由遍历函数dopath携带的函数指针参数决定。这样程序的结构清晰，可扩充性好。</p>
+<h5 id="实验设计思路："><a href="#实验设计思路：" class="headerlink" title="实验设计思路："></a>实验设计思路：</h5><p>在书上例子的基础上实现功能的增加。具体方案如下：</p>
+<p>功能1函数：（只需要在原本的myfunc函数中加入检测文件大小的内容即可）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span></span></span><br><span class="line"><span class="function"><span class="title">myfuncExtra</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">const</span> struct stat *statptr, <span class="keyword">int</span> type)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">switch</span> (type)</span><br><span class="line">	&#123;</span><br><span class="line">	<span class="keyword">case</span> FTW_F:</span><br><span class="line">		<span class="keyword">switch</span> (statptr-&gt;st_mode &amp; S_IFMT)</span><br><span class="line">		&#123;</span><br><span class="line">		<span class="keyword">case</span> S_IFREG:</span><br><span class="line">			nreg++;</span><br><span class="line">			<span class="keyword">if</span> (statptr-&gt;st_size &lt;= <span class="number">4096</span>)</span><br><span class="line">				n4096++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFBLK:</span><br><span class="line">			nblk++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFCHR:</span><br><span class="line">			nchr++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFIFO:</span><br><span class="line">			nfifo++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFLNK:</span><br><span class="line">			nslink++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFSOCK:</span><br><span class="line">			nsock++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFDIR:;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">case</span> FTW_D:</span><br><span class="line">		ndir++;</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">case</span> FTW_DNR:</span><br><span class="line"></span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">case</span> FTW_NS:</span><br><span class="line"></span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">default</span>:;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> (<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>功能2函数：(通过一些库函数调用读取文件后直接比较文件内容即可,同时为避免打开太多文件，直接先通过比较文件大小来确定是否继续比较文件内容)</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span></span></span><br><span class="line"><span class="function"><span class="title">myfuncCompareContent</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">const</span> struct stat *statptr, <span class="keyword">int</span> type)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (type == FTW_F &amp;&amp; (statptr-&gt;st_mode &amp; S_IFMT) == S_IFREG &amp;&amp; statptr-&gt;st_size == filesize)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> fd;</span><br><span class="line">		<span class="keyword">if</span> ((fd = open(pathname, O_RDONLY, FILE_MODE)) == <span class="number">-1</span>)</span><br><span class="line"></span><br><span class="line">			<span class="keyword">return</span> (<span class="number">0</span>);</span><br><span class="line">		<span class="keyword">if</span> (read(fd, comparebuf, filesize) != filesize)</span><br><span class="line">			err_sys(<span class="string">&quot;read error &#x27;%s&#x27;\n&quot;</span>, pathname);</span><br><span class="line">		close(fd);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (<span class="built_in">strcmp</span>(filebuf, comparebuf) == <span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> (<span class="built_in">strcmp</span>(inputfilepath, pathname) != <span class="number">0</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				filefindcount++;</span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, pathname);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> (<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>功能3函数：(提取文件名后进行查找比较)</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span></span></span><br><span class="line"><span class="function"><span class="title">myfuncCompareName</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">const</span> struct stat *statptr, <span class="keyword">int</span> type)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (type == FTW_F)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> pos;</span><br><span class="line">		pos = getFileNamePos(pathname);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (<span class="built_in">strcmp</span>(inputfilename, pathname + pos) == <span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			filefindcount++;</span><br><span class="line">			<span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, pathname);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> (<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>功能实现函数如上，还有一些例如提取文件名功能的函数则直接不放在报告里了。</p>
+<p>使用不同功能的命令语法则同样是通过argc和argv来完成。</p>
+<h5 id="实验结果："><a href="#实验结果：" class="headerlink" title="实验结果："></a>实验结果：</h5><h6 id="源程序名：myfind-c"><a href="#源程序名：myfind-c" class="headerlink" title="源程序名：myfind.c"></a>源程序名：myfind.c</h6><h6 id="可执行程序名：myfind"><a href="#可执行程序名：myfind" class="headerlink" title="可执行程序名：myfind"></a>可执行程序名：myfind</h6><p>如何编译生成可执行程序：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gcc myfind.c -o myfind</span><br></pre></td></tr></table></figure>
+
+<p>功能1：</p>
+<p><img src="/2021/10/22/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/image-20211030231010931.png"></p>
+<p>功能2：</p>
+<p><img src="/2021/10/22/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/image-20211030231053103.png"></p>
+<p><img src="/2021/10/22/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/image-20211030231207598.png"></p>
+<p>功能3：</p>
+<p><img src="/2021/10/22/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/image-20211030231247119.png"></p>
+<p><img src="/2021/10/22/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/image-20211030231258458.png"></p>
+<h5 id="实验体会与心得："><a href="#实验体会与心得：" class="headerlink" title="实验体会与心得："></a>实验体会与心得：</h5><p>对文件的操作更加熟悉了一些，同时也接触到了一些库函数以及库函数的参数，不过在写代码的时候也遇到了一些不熟悉的地方，比如将FLIE_MODE写成了FILE_MOD报错未定义，然后一直去网上搜索怎么解决，最后才发现是少打了一个字母。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blackfankt.github.io/2021/10/22/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/" data-id="ckyxrtlsz0005ecw5bpgv652k" data-title="实验2 目录树的遍历" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Unix%E5%AE%9E%E9%AA%8C/" rel="tag">Unix实验</a></li></ul>
+
     </footer>
   </div>
   
@@ -347,7 +417,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Unix%E5%AE%9E%E9%AA%8C/" style="font-size: 10px;">Unix实验</a> <a href="/tags/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E5%AE%9E%E9%AA%8C/" style="font-size: 10px;">《计算机网络与通信》实验</a>
+      <a href="/tags/Unix%E5%AE%9E%E9%AA%8C/" style="font-size: 20px;">Unix实验</a> <a href="/tags/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E5%AE%9E%E9%AA%8C/" style="font-size: 10px;">《计算机网络与通信》实验</a>
     </div>
   </div>
 
@@ -356,7 +426,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/01/">一月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">十二月 2021</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">十二月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/11/">十一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a></li></ul>
     </div>
   </div>
 
@@ -369,15 +439,19 @@
       <ul>
         
           <li>
-            <a href="/2022/01/27/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/">实验2 目录树的遍历</a>
-          </li>
-        
-          <li>
-            <a href="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/">《计算机网络与通信》课程实验二</a>
-          </li>
-        
-          <li>
             <a href="/2021/12/21/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2021/11/14/%E5%AE%9E%E9%AA%8C3%20%E7%AE%80%E5%8D%95shell%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%AE%9E%E7%8E%B0/">实验3 简单shell的设计和实现</a>
+          </li>
+        
+          <li>
+            <a href="/2021/11/12/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/">《计算机网络与通信》课程实验二</a>
+          </li>
+        
+          <li>
+            <a href="/2021/10/22/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/">实验2 目录树的遍历</a>
           </li>
         
       </ul>
