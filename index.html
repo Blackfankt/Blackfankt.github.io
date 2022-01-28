@@ -73,63 +73,6 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-实验2 目录树的遍历" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2022/01/28/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/" class="article-date">
-  <time class="dt-published" datetime="2022-01-28T01:55:38.673Z" itemprop="datePublished">2022-01-28</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h2 id="实验2-目录树的遍历"><a href="#实验2-目录树的遍历" class="headerlink" title="实验2 目录树的遍历"></a>实验2 目录树的遍历</h2><h5 id="实验目的："><a href="#实验目的：" class="headerlink" title="实验目的："></a>实验目的：</h5><p>掌握与文件和目录树有关的系统调用和库函数。</p>
-<h5 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h5><p>1、编写程序myfind<br>命令语法：<br>        myfind  <pathname>  [-comp <filename> | -name <str>…]<br>命令语义：<br>（1）myfind  <pathname> 的功能：<br>除了具有与程序4-7相同的功能外，还要输出在<pathname>目录子树之下，文件长度不大于4096字节的常规文件，在所有允许访问的普通文件中所占的百分比。程序不允许打印出任何路径名。<br>（2）myfind  <pathname>  -comp  <filename>的功能：<br><filename>是常规文件的路径名（非目录名，但是其路径可以包含目录）。命令仅仅输出在<pathname>目录子树之下，所有与<filename>文件内容一致的文件的绝对路径名。不允许输出任何其它的路径名，包括不可访问的路径名。</filename></pathname></filename></filename></pathname></pathname></pathname></str></filename></pathname></p>
-<p>（3）myfind  <pathname>  -name <str>…的功能：<br><str>…是一个以空格分隔的文件名序列(不带路径)。命令输出在<pathname>目录子树之下，所有与<str>…序列中文件名相同的文件的绝对路径名。不允许输出不可访问的或无关的路径名。<br>       <pathname>和<filename>均既可以是绝对路径名，也可以是相对路径名。<pathname>既可以是目录，也可以是文件，此时，目录为当前工作目录。</pathname></filename></pathname></str></pathname></str></str></pathname></p>
-<p>2、注意尽可能地提高程序的效率。注意避免因打开太多文件而产生的错误。</p>
-<p>3、遍历目录树时，访问结点（目录项）的具体操作应当由遍历函数dopath携带的函数指针参数决定。这样程序的结构清晰，可扩充性好。</p>
-<h5 id="实验设计思路："><a href="#实验设计思路：" class="headerlink" title="实验设计思路："></a>实验设计思路：</h5><p>在书上例子的基础上实现功能的增加。具体方案如下：</p>
-<p>功能1函数：（只需要在原本的myfunc函数中加入检测文件大小的内容即可）</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span></span></span><br><span class="line"><span class="function"><span class="title">myfuncExtra</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">const</span> struct stat *statptr, <span class="keyword">int</span> type)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">switch</span> (type)</span><br><span class="line">	&#123;</span><br><span class="line">	<span class="keyword">case</span> FTW_F:</span><br><span class="line">		<span class="keyword">switch</span> (statptr-&gt;st_mode &amp; S_IFMT)</span><br><span class="line">		&#123;</span><br><span class="line">		<span class="keyword">case</span> S_IFREG:</span><br><span class="line">			nreg++;</span><br><span class="line">			<span class="keyword">if</span> (statptr-&gt;st_size &lt;= <span class="number">4096</span>)</span><br><span class="line">				n4096++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFBLK:</span><br><span class="line">			nblk++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFCHR:</span><br><span class="line">			nchr++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFIFO:</span><br><span class="line">			nfifo++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFLNK:</span><br><span class="line">			nslink++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFSOCK:</span><br><span class="line">			nsock++;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> S_IFDIR:;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">case</span> FTW_D:</span><br><span class="line">		ndir++;</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">case</span> FTW_DNR:</span><br><span class="line"></span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">case</span> FTW_NS:</span><br><span class="line"></span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">default</span>:;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> (<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>功能2函数：(通过一些库函数调用读取文件后直接比较文件内容即可,同时为避免打开太多文件，直接先通过比较文件大小来确定是否继续比较文件内容)</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span></span></span><br><span class="line"><span class="function"><span class="title">myfuncCompareContent</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">const</span> struct stat *statptr, <span class="keyword">int</span> type)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (type == FTW_F &amp;&amp; (statptr-&gt;st_mode &amp; S_IFMT) == S_IFREG &amp;&amp; statptr-&gt;st_size == filesize)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> fd;</span><br><span class="line">		<span class="keyword">if</span> ((fd = open(pathname, O_RDONLY, FILE_MODE)) == <span class="number">-1</span>)</span><br><span class="line"></span><br><span class="line">			<span class="keyword">return</span> (<span class="number">0</span>);</span><br><span class="line">		<span class="keyword">if</span> (read(fd, comparebuf, filesize) != filesize)</span><br><span class="line">			err_sys(<span class="string">&quot;read error &#x27;%s&#x27;\n&quot;</span>, pathname);</span><br><span class="line">		close(fd);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (<span class="built_in">strcmp</span>(filebuf, comparebuf) == <span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> (<span class="built_in">strcmp</span>(inputfilepath, pathname) != <span class="number">0</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				filefindcount++;</span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, pathname);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> (<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>功能3函数：(提取文件名后进行查找比较)</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span></span></span><br><span class="line"><span class="function"><span class="title">myfuncCompareName</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">const</span> struct stat *statptr, <span class="keyword">int</span> type)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (type == FTW_F)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> pos;</span><br><span class="line">		pos = getFileNamePos(pathname);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (<span class="built_in">strcmp</span>(inputfilename, pathname + pos) == <span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			filefindcount++;</span><br><span class="line">			<span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, pathname);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> (<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>功能实现函数如上，还有一些例如提取文件名功能的函数则直接不放在报告里了。</p>
-<p>使用不同功能的命令语法则同样是通过argc和argv来完成。</p>
-<h5 id="实验结果："><a href="#实验结果：" class="headerlink" title="实验结果："></a>实验结果：</h5><h6 id="源程序名：myfind-c"><a href="#源程序名：myfind-c" class="headerlink" title="源程序名：myfind.c"></a>源程序名：myfind.c</h6><h6 id="可执行程序名：myfind"><a href="#可执行程序名：myfind" class="headerlink" title="可执行程序名：myfind"></a>可执行程序名：myfind</h6><p>如何编译生成可执行程序：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gcc myfind.c -o myfind</span><br></pre></td></tr></table></figure>
-
-<p>功能1：</p>
-<p><img src="/2022/01/28/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/image-20211030231010931.png"></p>
-<p>功能2：</p>
-<p><img src="/2022/01/28/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/image-20211030231053103.png"></p>
-<p><img src="/2022/01/28/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/image-20211030231207598.png"></p>
-<p>功能3：</p>
-<p><img src="/2022/01/28/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/image-20211030231247119.png"></p>
-<p><img src="/2022/01/28/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/image-20211030231258458.png"></p>
-<h5 id="实验体会与心得："><a href="#实验体会与心得：" class="headerlink" title="实验体会与心得："></a>实验体会与心得：</h5><p>对文件的操作更加熟悉了一些，同时也接触到了一些库函数以及库函数的参数，不过在写代码的时候也遇到了一些不熟悉的地方，比如将FLIE_MODE写成了FILE_MOD报错未定义，然后一直去网上搜索怎么解决，最后才发现是少打了一个字母。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://blackfankt.github.io/2022/01/28/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/" data-id="ckyxr8f4r0000egw59m583rxa" data-title="" class="article-share-link">分享</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
     <article id="post-《计算机网络与通信》课程实验二" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/" class="article-date">
@@ -247,10 +190,12 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://blackfankt.github.io/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/" data-id="ckyvg00xp0001mkw5g1282dxy" data-title="《计算机网络与通信》课程实验二" class="article-share-link">分享</a>
+      <a data-url="https://blackfankt.github.io/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/" data-id="ckyxrbf2a0001usw5e0180c1z" data-title="《计算机网络与通信》课程实验二" class="article-share-link">分享</a>
       
       
       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E5%AE%9E%E9%AA%8C/" rel="tag">《计算机网络与通信》实验</a></li></ul>
+
     </footer>
   </div>
   
@@ -298,7 +243,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://blackfankt.github.io/2021/12/21/hello-world/" data-id="ckyvg00xi0000mkw579fuaz73" data-title="Hello World" class="article-share-link">分享</a>
+      <a data-url="https://blackfankt.github.io/2021/12/21/hello-world/" data-id="ckyxrbf240000usw5eyw1fhl3" data-title="Hello World" class="article-share-link">分享</a>
       
       
       
@@ -320,9 +265,23 @@
 
   
     
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E5%AE%9E%E9%AA%8C/" rel="tag">《计算机网络与通信》实验</a></li></ul>
+    </div>
+  </div>
+
 
   
     
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E5%AE%9E%E9%AA%8C/" style="font-size: 10px;">《计算机网络与通信》实验</a>
+    </div>
+  </div>
+
   
     
   <div class="widget-wrap">
@@ -339,10 +298,6 @@
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
-        
-          <li>
-            <a href="/2022/01/28/%E5%AE%9E%E9%AA%8C2%20%E7%9B%AE%E5%BD%95%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86/">(no title)</a>
-          </li>
         
           <li>
             <a href="/2022/01/26/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%B8%8E%E9%80%9A%E4%BF%A1%E3%80%8B%E8%AF%BE%E7%A8%8B%E5%AE%9E%E9%AA%8C%E4%BA%8C/">《计算机网络与通信》课程实验二</a>
