@@ -1,11 +1,11 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>实验3 简单shell的设计和实现 | Riceater</title><script src="//unpkg.com/valine/dist/Valine.min.js"></script><link rel="stylesheet" href="/css/arknights.css"><link rel="stylesheet" href="//unpkg.com/@highlightjs/cdn-assets@11.4.0/styles/atom-one-dark-reasonable.min.css"><style>@font-face {
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>UNIX实验3 简单shell的设计和实现 | Riceater</title><script src="//unpkg.com/valine/dist/Valine.min.js"></script><link rel="stylesheet" href="/css/arknights.css"><link rel="stylesheet" href="//unpkg.com/@highlightjs/cdn-assets@11.4.0/styles/atom-one-dark-reasonable.min.css"><style>@font-face {
  font-family: BenderLight;
  src: local('Bender'), url("/font/BenderLight.ttf");
 }
 @font-face {
  font-family: 'JetBrains Mono';
  src: local('JetBrains Mono'), url('/font/JetBrainsMono-Regular.woff2') format('woff2');
-}</style><meta name="generator" content="Hexo 5.4.1"></head><body style="background-image:url(https://ak.hypergryph.com/assets/index/images/ak/pc/bk.jpg);"><header><nav><a href="/">Home</a><a href="/archives/">Archives</a></nav></header><main><article><div id="post-bg"><div id="post-title"><h1>实验3 简单shell的设计和实现</h1><hr></div><div id="post-content"><h3 id="实验目的"><a href="#实验目的" class="headerlink" title="实验目的"></a>实验目的</h3><hr>
+}</style><meta name="generator" content="Hexo 5.4.1"></head><body style="background-image:url(https://ak.hypergryph.com/assets/index/images/ak/pc/bk.jpg);"><header><nav><a href="/">Home</a><a href="/archives/">Archives</a></nav></header><main><article><div id="post-bg"><div id="post-title"><h1>UNIX实验3 简单shell的设计和实现</h1><hr></div><div id="post-content"><h3 id="实验目的"><a href="#实验目的" class="headerlink" title="实验目的"></a>实验目的</h3><hr>
 <p>1.练习使用编程环境，包括shell的命令，vi和gcc编译器。<br>2.体会进程概念，了解fork，execve，wait等系统调用。</p>
 <h3 id="实验要求"><a href="#实验要求" class="headerlink" title="实验要求"></a>实验要求</h3><hr>
 <p>1.除了系统调用execve，不允许使用其他的exec函数。输入应当允许带多个参数(一行内可以表示)，不考虑通配符 (即“*”、“?”、“-”等等)的处理。<br>2.输入错误命令能提示出错并进入下一轮接收命令状态。<br>3.可以用Ctrl-C和Ctrl-\结束简单shell的运行。<br>4.程序运行正确，提示简洁明确。<br>5.实验提交文件为：实验报告、源程序、可执行程序。</p>

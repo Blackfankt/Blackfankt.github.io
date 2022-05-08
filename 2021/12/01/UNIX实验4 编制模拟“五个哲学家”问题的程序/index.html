@@ -1,11 +1,11 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>实验4 编制模拟“五个哲学家”问题的程序 | Riceater</title><script src="//unpkg.com/valine/dist/Valine.min.js"></script><link rel="stylesheet" href="/css/arknights.css"><link rel="stylesheet" href="//unpkg.com/@highlightjs/cdn-assets@11.4.0/styles/atom-one-dark-reasonable.min.css"><style>@font-face {
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>UNIX实验4 编制模拟“五个哲学家”问题的程序 | Riceater</title><script src="//unpkg.com/valine/dist/Valine.min.js"></script><link rel="stylesheet" href="/css/arknights.css"><link rel="stylesheet" href="//unpkg.com/@highlightjs/cdn-assets@11.4.0/styles/atom-one-dark-reasonable.min.css"><style>@font-face {
  font-family: BenderLight;
  src: local('Bender'), url("/font/BenderLight.ttf");
 }
 @font-face {
  font-family: 'JetBrains Mono';
  src: local('JetBrains Mono'), url('/font/JetBrainsMono-Regular.woff2') format('woff2');
-}</style><meta name="generator" content="Hexo 5.4.1"></head><body style="background-image:url(https://ak.hypergryph.com/assets/index/images/ak/pc/bk.jpg);"><header><nav><a href="/">Home</a><a href="/archives/">Archives</a></nav></header><main><article><div id="post-bg"><div id="post-title"><h1>实验4 编制模拟“五个哲学家”问题的程序</h1><hr></div><div id="post-content"><h5 id="实验目的："><a href="#实验目的：" class="headerlink" title="实验目的："></a>实验目的：</h5><p>学习和掌握并发进程同步的概念和方法。</p>
+}</style><meta name="generator" content="Hexo 5.4.1"></head><body style="background-image:url(https://ak.hypergryph.com/assets/index/images/ak/pc/bk.jpg);"><header><nav><a href="/">Home</a><a href="/archives/">Archives</a></nav></header><main><article><div id="post-bg"><div id="post-title"><h1>UNIX实验4 编制模拟“五个哲学家”问题的程序</h1><hr></div><div id="post-content"><h5 id="实验目的："><a href="#实验目的：" class="headerlink" title="实验目的："></a>实验目的：</h5><p>学习和掌握并发进程同步的概念和方法。</p>
 <h5 id="实验内容："><a href="#实验内容：" class="headerlink" title="实验内容："></a>实验内容：</h5><p>11、程序语法<br>        <code>philosopher   [ -t  &lt;time&gt; ]</code></p>
 <p><code>&lt;time&gt;</code>是哲学家进餐和沉思的持续时间值，缺省值为2秒。<br>2、五个哲学家的编号为0~4，分别用五个进程独立模拟。<br>3、程序的输出要简洁，仅输出每个哲学家进餐和沉思的信息。</p>
 <p>例如，当编号为3的哲学家在进餐时，就打印：<br>        <code>philosopher 3 is eating</code><br>而当他在沉思时，则打印：<br>         <code>philosopher 3 is thinking</code><br>除此之外不要输出其他任何信息。<br>4、利用课堂已教授的知识而不使用线程或IPC机制进行同步。</p>
